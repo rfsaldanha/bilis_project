@@ -1,0 +1,121 @@
+---
+title: "Technology"
+---
+
+## Philosophy
+
+BILIS aims to provide technology to compute health indicators in a seamless way. For this, some dedicated core packages are being constructed and maintained for specific tasks.
+
+This compartimented approach ensures easy of maintenance, expansion of features, scalability and reprodutibility.
+
+All packages are developed in R with open code and uses unit testing to ensure reliability of results.
+
+## Core packages
+
+### `rpcdas` package
+
+This is an opinionated API wrapper that collects data at the PCDaS API end-point and returns results in a `tibble` format.
+
+The main package functions starts with `get`, like `get_sim`, `get_sinasc`, and etc. Each function retrieves data from a health system indexed by PCDaS.
+
+Parameters like spatial and time aggregation and year of reference must be supplied.
+
+Spatial parameters:
+
+-   UF of residence or occurrence
+-   Healh region of residence or occurrence
+-   Municipality of residence or occurrence
+
+Time parameters:
+
+-   Year
+-   Month
+-   Week
+
+Other parameters like `cid_like`, `sex`, `idade` and others may be used as filters in the query. An special parameter called `more_filters` may be used to filter results using SQL language.
+
+```{r}
+rpcdas::get_sim(agg = "uf_res", agg_time = "month", ano = 2010)
+```
+
+The package uses unit testing to ensure reliable results. More details available at the [package webpage](https://rfsaldanha.github.io/rpcdas/).
+
+### `recbilis` package
+
+This package is used to retrieve data stored at the PostgreSQL server, hosted by ICICT. This database contains schemas and tables of some health systems not available at PCDaS yet, including SINAN subsystems (SINAN-Dengue, SINAN-Zika, SINAN-Chikungunya, and etc).
+
+The main package functions starts with `get`, like `get_dengue`, `get_zika`, and etc.
+
+Spatial parameters:
+
+-   UF of residence or occurrence
+-   Healh region of residence or occurrence
+-   Municipality of residence or occurrence
+
+Time parameters:
+
+-   Year
+-   Month
+-   Week
+
+```{r}
+recbilis::get_dengue(agg = "uf_res", agg_time = "month", ano = 2010)
+```
+
+Note that `rpcdas` and `recbilis` uses the same parameters names and configuration wherever its possible for seamless usage.
+
+The package uses unit testing to ensure reliable results. More details at the [package website](https://rfsaldanha.github.io/recbilis/).
+
+### `brpop` package
+
+This package provides population estimates for Brazilian administrative units.
+
+-   UF
+-   Health regions
+-   Municialities
+
+```{r}
+brpop::uf_pop_totals()
+```
+
+The package uses unit testing to ensure reliable results.
+
+More details at the [package webpage](https://rfsaldanha.github.io/brpop/).
+
+## The `bilis` package
+
+The `bilis` package internally calls `rpcdas`, `recbilis` and `brpop` functions to compute numerators and denominators for health indicators.
+
+The main functions starts with `indi_`, where each health indicator definition has a number. The same indicator definition may be applied to compute the health indicator for different spatial and time units, and time intervals.
+
+```{r}
+bilis::indi_0001(agg = "uf_res", agg_time = "month", ano = 2010)
+```
+
+The computation of several health indicators definitions for several spatial and time aggregation is possible with the `expand` functions.
+
+A `expand` function computes the combination of health indicators definitions with spatial and time aggregations in parallel computing, writing its results in a PostgreSQL or SQLite database or parquet files.
+
+```{r}
+#| eval: false
+bilis::expand_indi_parquet(
+  agg = c("uf_res", "mun_res"), 
+  agg_time = c("year", "month"), 
+  anos = 2010:2011, 
+  indi = c("indi_0001", "indi_0002"),
+  dir = tempdir()
+)
+```
+
+More details available at the [package webpage](https://rfsaldanha.github.io/bilis/).
+
+## Session info
+
+```{r}
+library(rpcdas)
+library(recbilis)
+library(brpop)
+library(bilis)
+
+sessionInfo()
+```

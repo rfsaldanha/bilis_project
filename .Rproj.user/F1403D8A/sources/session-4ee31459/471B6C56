@@ -1,0 +1,32 @@
+{
+    "id": "471B6C56",
+    "path": "~/projects/bilis_project/technology.qmd",
+    "project_path": "technology.qmd",
+    "type": "quarto_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1689594867546.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "rmdVisualMode": "false",
+        "rmdVisualWrapConfigured": "true",
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "docOutlineVisible": "1",
+        "rmdVisualCollapsedChunks": "",
+        "cursorPosition": "6,176",
+        "scrollLine": "0",
+        "rmdVisualModeLocation": "464:61"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1689599252,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1689599252343,
+    "read_only": false,
+    "read_only_alternatives": []
+}

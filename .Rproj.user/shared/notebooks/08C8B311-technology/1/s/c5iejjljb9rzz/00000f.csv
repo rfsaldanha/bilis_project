@@ -1,0 +1,5 @@
+"0","library(rpcdas)"
+"0",""
+"0","res <- get_sim(agg = ""uf_res"", agg_time = ""month"", ano = 2010:2012)"
+"0",""
+"0","res"

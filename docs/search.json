@@ -1,0 +1,58 @@
+[
+  {
+    "objectID": "indicators.html",
+    "href": "indicators.html",
+    "title": "Indicators",
+    "section": "",
+    "text": "A list of currently available indicators computed by BILIS.\n\nMortalidade por causas externas (indi_0001)\nMortalidade por AVC (indi_0002)\nMortalidade por doencas isquêmicas do coração (indi_0003)\nMortalidade por Acidentes de transportes terrestres (indi_0004)\nMortalidade por suicidio (indi_0005)\nMortalidade por neoplasia maligna da mama (indi_0006)\nMortalidade por neoplasia maligna da cólo de útero (indi_0007)\nMortalidade por neoplasia maligna de próstata (indi_0008)\nMortalidade proporcional por doença diarréica aguda em menores de 5 anos (indi_0009)\nTaxa de Mortalidade Infantil (indi_0010)\nTaxa de Mortalidade em menores de 5 anos (indi_0011)\nMortalidade proporcional por infecção respiratória aguda em menores de 5 anos de idade (indi_0012)\nTaxa de mortalidade específica por doenças do aparelho circulatório (indi_0013)\nTaxa de mortalidade por dengue (indi_0014)\nTaxa de incidência de dengue clássico (indi_0015)\nTaxa de incidência de zika (indi_0016)\nTaxa de incidência de chikungunya (indi_0017)\nTaxa de incidência de febre amarela (indi_0018)\n.Taxa de incidência de doença de chagas (indi_0019)\nTaxa de incidência de leishmaniose tegumentar (indi_0020)\nTaxa de incidência de leishmaniose visceral (indi_0021)\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "BILIS",
+    "section": "",
+    "text": "This a project for the creation, computation and dissemination of health indicators for the Brazilian territory.\nICICT, Fiocruz."
+  },
+  {
+    "objectID": "workflow.html",
+    "href": "workflow.html",
+    "title": "Workflow",
+    "section": "",
+    "text": "flowchart TD\n\nSIM[SIM] --&gt; PCDaS{PCDaS API}\nSINASC[SINASC] --&gt; PCDaS\nSIH[SIH] --&gt; PCDaS\nCNES[CNES] --&gt; PCDaS\n\nSDengue[SINAN Dengue] --&gt; PSQL{PostgreSQL}\nSZika[SINAN Zika] --&gt; PSQL\nSChik[SINAN Chikungunya] --&gt; PSQL\nSOutros[SINAN Outros] --&gt; PSQL\n\npop[Population data] --&gt; brpop(brpop package)\n\nPCDaS --&gt; rpcdas(rpcdas package)\nPSQL --&gt; recbilis(recbilis package)\n\nrpcdas --&gt; bilis(bilis)\nrecbilis --&gt; bilis\nbrpop --&gt; bilis\n\nbilis --&gt; exp{Compute and export\\nhealth indicators}\n\nexp --&gt; database[Databases]\nexp --&gt; parquet[Static files]\n\n\n\n\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "technology.html",
+    "href": "technology.html",
+    "title": "Technology",
+    "section": "",
+    "text": "BILIS aims to provide technology to compute health indicators in a seamless way. For this, some dedicated core packages are being constructed and maintained for specific tasks.\nThis compartimented approach ensures easy of maintenance, expansion of features, scalability and reprodutibility.\nAll packages are developed in R with open code and uses unit testing to ensure reliability of results."
+  },
+  {
+    "objectID": "technology.html#philosophy",
+    "href": "technology.html#philosophy",
+    "title": "Technology",
+    "section": "",
+    "text": "BILIS aims to provide technology to compute health indicators in a seamless way. For this, some dedicated core packages are being constructed and maintained for specific tasks.\nThis compartimented approach ensures easy of maintenance, expansion of features, scalability and reprodutibility.\nAll packages are developed in R with open code and uses unit testing to ensure reliability of results."
+  },
+  {
+    "objectID": "technology.html#core-packages",
+    "href": "technology.html#core-packages",
+    "title": "Technology",
+    "section": "Core packages",
+    "text": "Core packages\n\nrpcdas package\nThis is an opinionated API wrapper that collects data at the PCDaS API end-point and returns results in a tibble format.\nThe main package functions starts with get, like get_sim, get_sinasc, and etc. Each function retrieves data from a health system indexed by PCDaS.\nParameters like spatial and time aggregation and year of reference must be supplied.\nSpatial parameters:\n\nUF of residence or occurrence\nHealh region of residence or occurrence\nMunicipality of residence or occurrence\n\nTime parameters:\n\nYear\nMonth\nWeek\n\nOther parameters like cid_like, sex, idade and others may be used as filters in the query. An special parameter called more_filters may be used to filter results using SQL language.\n\nrpcdas::get_sim(agg = \"uf_res\", agg_time = \"month\", ano = 2010)\n\n# A tibble: 324 × 3\n     agg agg_time  freq\n   &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;\n 1    11 2010-01    675\n 2    11 2010-02    594\n 3    11 2010-03    597\n 4    11 2010-04    588\n 5    11 2010-05    618\n 6    11 2010-06    533\n 7    11 2010-07    585\n 8    11 2010-08    633\n 9    11 2010-09    612\n10    11 2010-10    624\n# ℹ 314 more rows\n\n\nThe package uses unit testing to ensure reliable results. More details available at the package webpage.\n\n\nrecbilis package\nThis package is used to retrieve data stored at the PostgreSQL server, hosted by ICICT. This database contains schemas and tables of some health systems not available at PCDaS yet, including SINAN subsystems (SINAN-Dengue, SINAN-Zika, SINAN-Chikungunya, and etc).\nThe main package functions starts with get, like get_dengue, get_zika, and etc.\nSpatial parameters:\n\nUF of residence or occurrence\nHealh region of residence or occurrence\nMunicipality of residence or occurrence\n\nTime parameters:\n\nYear\nMonth\nWeek\n\n\nrecbilis::get_dengue(agg = \"uf_res\", agg_time = \"month\", ano = 2010)\n\n# A tibble: 324 × 3\n     agg agg_time  freq\n   &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;\n 1    11 2010-01   9041\n 2    11 2010-10     92\n 3    11 2010-11    332\n 4    11 2010-12    484\n 5    11 2010-02   4930\n 6    11 2010-03   1620\n 7    11 2010-04    615\n 8    11 2010-05    295\n 9    11 2010-06    150\n10    11 2010-07     79\n# ℹ 314 more rows\n\n\nNote that rpcdas and recbilis uses the same parameters names and configuration wherever its possible for seamless usage.\nThe package uses unit testing to ensure reliable results. More details at the package website.\n\n\nbrpop package\nThis package provides population estimates for Brazilian administrative units.\n\nUF\nHealth regions\nMunicialities\n\n\nbrpop::uf_pop_totals()\n\n# A tibble: 594 × 3\n      uf  year     pop\n   &lt;dbl&gt; &lt;dbl&gt;   &lt;int&gt;\n 1    11  2000 1409018\n 2    11  2001 1432779\n 3    11  2002 1454686\n 4    11  2003 1474963\n 5    11  2004 1494506\n 6    11  2005 1513687\n 7    11  2006 1532259\n 8    11  2007 1549747\n 9    11  2008 1566588\n10    11  2009 1582874\n# ℹ 584 more rows\n\n\nThe package uses unit testing to ensure reliable results.\nMore details at the package webpage."
+  },
+  {
+    "objectID": "technology.html#the-bilis-package",
+    "href": "technology.html#the-bilis-package",
+    "title": "Technology",
+    "section": "The bilis package",
+    "text": "The bilis package\nThe bilis package internally calls rpcdas, recbilis and brpop functions to compute numerators and denominators for health indicators.\nThe main functions starts with indi_, where each health indicator definition has a number. The same indicator definition may be applied to compute the health indicator for different spatial and time units, and time intervals.\n\nbilis::indi_0001(agg = \"uf_res\", agg_time = \"month\", ano = 2010)\n\n# A tibble: 324 × 4\n     cod date    name      value\n   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;\n 1    11 2010-01 indi_0001  7.94\n 2    11 2010-02 indi_0001  6.63\n 3    11 2010-03 indi_0001  7.88\n 4    11 2010-04 indi_0001  7.76\n 5    11 2010-05 indi_0001  8.63\n 6    11 2010-06 indi_0001  7.13\n 7    11 2010-07 indi_0001  7.82\n 8    11 2010-08 indi_0001  9.32\n 9    11 2010-09 indi_0001  8.69\n10    11 2010-10 indi_0001  9.32\n# ℹ 314 more rows\n\n\nThe computation of several health indicators definitions for several spatial and time aggregation is possible with the expand functions.\nA expand function computes the combination of health indicators definitions with spatial and time aggregations in parallel computing, writing its results in a PostgreSQL or SQLite database or parquet files.\n\nbilis::expand_indi_parquet(\n  agg = c(\"uf_res\", \"mun_res\"), \n  agg_time = c(\"year\", \"month\"), \n  anos = 2010:2011, \n  indi = c(\"indi_0001\", \"indi_0002\"),\n  dir = tempdir()\n)\n\nMore details available at the package webpage."
+  },
+  {
+    "objectID": "technology.html#session-info",
+    "href": "technology.html#session-info",
+    "title": "Technology",
+    "section": "Session info",
+    "text": "Session info\n\nlibrary(rpcdas)\nlibrary(recbilis)\nlibrary(brpop)\nlibrary(bilis)\n\nsessionInfo()\n\nR version 4.1.2 (2021-11-01)\nPlatform: x86_64-pc-linux-gnu (64-bit)\nRunning under: Ubuntu 22.04.2 LTS\n\nMatrix products: default\nBLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.10.0\nLAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.10.0\n\nlocale:\n [1] LC_CTYPE=pt_BR.UTF-8       LC_NUMERIC=C              \n [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    \n [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   \n [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 \n [9] LC_ADDRESS=C               LC_TELEPHONE=C            \n[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       \n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nother attached packages:\n[1] bilis_0.2.0         brpop_0.3.0         recbilis_0.0.0.9000\n[4] rpcdas_0.3.0       \n\nloaded via a namespace (and not attached):\n [1] Rcpp_1.0.11       dbplyr_2.3.3      pillar_1.9.0      compiler_4.1.2   \n [5] httr2_0.2.3       tools_4.1.2       RPostgres_1.4.5   digest_0.6.33    \n [9] bit_4.0.5         timechange_0.2.0  lubridate_1.9.2   jsonlite_1.8.7   \n[13] evaluate_0.21     lifecycle_1.0.3   tibble_3.2.1      checkmate_2.2.0  \n[17] pkgconfig_2.0.3   rlang_1.1.1       cli_3.6.1         DBI_1.1.3        \n[21] rstudioapi_0.15.0 curl_5.0.1        yaml_2.3.7        xfun_0.39        \n[25] fastmap_1.1.1     stringr_1.5.0     withr_2.5.0       dplyr_1.1.2      \n[29] knitr_1.43        generics_0.1.3    vctrs_0.6.3       htmlwidgets_1.6.2\n[33] rappdirs_0.3.3    hms_1.1.3         bit64_4.0.5       tidyselect_1.2.0 \n[37] glue_1.6.2        R6_2.5.1          fansi_1.0.4       rmarkdown_2.23   \n[41] tidyr_1.3.0       purrr_1.0.1       blob_1.2.4        magrittr_2.0.3   \n[45] backports_1.4.1   htmltools_0.5.5   utf8_1.2.3        stringi_1.7.12"
+  }
+]
